@@ -7,6 +7,7 @@ include $(THEOS)/makefiles/common.mk
 TWEAK_NAME = aimneckff
 aimneckff_FILES = Tweak.xm
 aimneckff_FRAMEWORKS = Foundation UIKit
+aimneckff_LIBRARIES = substrate
 aimneckff_CFLAGS = -fobjc-arc -O2
 aimneckff_LDFLAGS = -undefined dynamic_lookup
 
