@@ -15,7 +15,7 @@ static uintptr_t OFF_P_AVATAR       = 0x0;
 static uintptr_t OFF_P_TEAM         = 0x0;
 static uintptr_t OFF_P_IS_LOCAL     = 0x0;
 
-static uintptr_t OFF_A_BONES_ARRAY  = 0x0;
+static uintptr_t OFF_A_BONES_ARRAY  = 0x14A4B0;
 static uintptr_t OFF_C_VIEW_ANGLE   = 0x0;
 
 static struct {
