@@ -5,15 +5,10 @@ jobs:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Install Theos
-      run: >
-        rm -rf ~/theos;
-        git clone --recursive https://github.com/theos/theos.git ~/theos;
-        rm -rf ~/theos/sdks;
-        git clone --depth 1 https://github.com/theos/sdks.git ~/theos/sdks;
+    - name: Setup Theos
+      uses: Randomblock1/theos-action@v1
     - name: Build
-      run: >
-        export THEOS=~/theos && make package FINALPACKAGE=1
+      run: make package FINALPACKAGE=1
     - name: Upload Deb
       uses: actions/upload-artifact@v4
       with:
