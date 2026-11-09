@@ -1,0 +1,8 @@
+Package: com.freddy.aimneckff
+Name: aimneckff
+Version: 1.0.0
+Architecture: iphoneos-arm64
+Description: FF iOS aim neck
+Maintainer: Freddy
+Author: Freddy
+Section: Tweaks
