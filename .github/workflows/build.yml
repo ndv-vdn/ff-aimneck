@@ -7,12 +7,14 @@ jobs:
     - uses: actions/checkout@v4
     - name: Install Theos
       run: |
-        export THEOS=${{ github.workspace }}/theos
+        export THEOS=$HOME/theos
+        rm -rf $THEOS
         git clone --recursive https://github.com/theos/theos.git $THEOS
-        git clone https://github.com/theos/sdks.git $THEOS/sdks
+        rm -rf $THEOS/sdks
+        git clone --depth 1 https://github.com/theos/sdks.git $THEOS/sdks
     - name: Build
       run: |
-        export THEOS=${{ github.workspace }}/theos
+        export THEOS=$HOME/theos
         make package FINALPACKAGE=1
     - name: Upload Deb
       uses: actions/upload-artifact@v4
