@@ -1,5 +1,6 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import <objc/runtime.h>
 #import <mach-o/dyld.h>
 #import <mach/mach.h>
 #import <math.h>
@@ -7,10 +8,6 @@
 #define FF_BUNDLE   @"com.dts.freefireth"
 #define LOG_PREFIX  @"[aimneck]"
 
-// ═══════════════════════════════════════════════
-//  BLOCK 1 — ĐIỀN RVA TỪ dump.cs (OB55)
-//  (Khi có số thật, mày thay 0x0 bằng số đó)
-// ═══════════════════════════════════════════════
 static uintptr_t RVA_LOCAL_PLAYER   = 0x0;
 static uintptr_t RVA_PLAYER_LIST    = 0x0;
 static uintptr_t RVA_CAMERA         = 0x0;
@@ -23,15 +20,12 @@ static uintptr_t OFF_P_IS_LOCAL     = 0x0;
 static uintptr_t OFF_A_BONES_ARRAY  = 0x0;
 static uintptr_t OFF_C_VIEW_ANGLE   = 0x0;
 
-// ═══════════════════════════════════════════════
-//  BLOCK 2 — CẤU HÌNH AIM NECK
-// ═══════════════════════════════════════════════
 static struct {
     bool   enabled;
-    int    aimBone;       // 9 = Neck, 10 = Head
-    float  aimOffsetY;    // Hạ tâm từ đầu xuống cổ
-    float  aimSmooth;     // 0.3 - 0.5
-    float  aimFov;        // Góc quét
+    int    aimBone;
+    float  aimOffsetY;
+    float  aimSmooth;
+    float  aimFov;
     float  maxDist;
 } CFG = { 
     .enabled=false, 
@@ -45,9 +39,6 @@ static struct {
 typedef struct { float x, y, z; } Vec3;
 typedef struct { float pitch, yaw; } Vec2;
 
-// ═══════════════════════════════════════════════
-//  BLOCK 3 — HÀM HỖ TRỢ AN TOÀN
-// ═══════════════════════════════════════════════
 static uintptr_t g_lib_base = 0;
 static uintptr_t lib_base(void) {
     if (g_lib_base) return g_lib_base;
@@ -147,4 +138,13 @@ static uintptr_t find_nearest_enemy(Vec3 mypos, int myteam) {
 }
 
 static void aim_at(uintptr_t target) {
-    uintptr_t lp = get_local_player(); if (!lp || !t
+    uintptr_t lp = get_local_player(); if (!lp || !target) return;
+    Vec3 my = get_player_pos(lp); Vec3 neck = get_neck_pos(target);
+    if (neck.x==0 && neck.y==0 && neck.z==0) return;
+    float dx = neck.x-my.x, dy = neck.y-my.y, dz = neck.z-my.z;
+    float yaw = atan2f(dy, dx) * 180.0f / M_PI;
+    float pitch = atan2f(dz, sqrtf(dx*dx + dy*dy)) * 180.0f / M_PI;
+    uintptr_t cam = RVA_CAMERA ? read_ptr(rva(RVA_CAMERA)) : 0;
+    if (cam && OFF_C_VIEW_ANGLE) {
+        Vec2 cur = read_vec2(cam + OFF_C_VIEW_ANGLE);
+        float dyaw = fabsf(yaw - cur.yaw); if (dyaw > 180)
