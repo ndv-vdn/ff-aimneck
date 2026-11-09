@@ -1,0 +1,21 @@
+name: Build Tweak
+on: [push, workflow_dispatch]
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install Theos
+      run: |
+        export THEOS=$HOME/theos
+        git clone --recursive https://github.com/theos/theos.git $THEOS
+        git clone https://github.com/theos/sdks.git $THEOS/sdks
+    - name: Build
+      run: |
+        export THEOS=$HOME/theos
+        make package FINALPACKAGE=1
+    - name: Upload Deb
+      uses: actions/upload-artifact@v4
+      with:
+        name: aimneckff-deb
+        path: packages/*.deb
