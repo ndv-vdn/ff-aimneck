@@ -1,10 +1,21 @@
-ARCHS = arm64 arm64e
-TARGET = iphone:clang:latest:15.0
-INSTALL_TARGET_PROCESSES = FreeFire
-include $(THEOS)/makefiles/common.mk
-TWEAK_NAME = aimneckff
-aimneckff_FILES = Tweak.xm
-aimneckff_FRAMEWORKS = Foundation UIKit
-aimneckff_CFLAGS = -fobjc-arc -O2
-aimneckff_LDFLAGS = -undefined dynamic_lookup
-include $(THEOS)/makefiles/tweak.mk
+name: Build Tweak
+on: [push, workflow_dispatch]
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install Theos
+      run: |
+        export THEOS=$HOME/build_theos
+        git clone --recursive https://github.com/theos/theos.git $THEOS
+        git clone https://github.com/theos/sdks.git $THEOS/sdks
+    - name: Build
+      run: |
+        export THEOS=$HOME/build_theos
+        make package FINALPACKAGE=1
+    - name: Upload Deb
+      uses: actions/upload-artifact@v4
+      with:
+        name: aimneckff-deb
+        path: packages/*.deb
